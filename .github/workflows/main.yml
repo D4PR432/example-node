@@ -21,6 +21,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
       - name: Install dependencies
-        run: npm install
+        run: npm ci  # npm ci es más estricto que npm install
+        shell: bash
       - name: Run Jest tests
-        run: npm test
+        run: |
+          npm test
+        shell: bash
