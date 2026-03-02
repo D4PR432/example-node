@@ -39,7 +39,7 @@ jobs:
       - name: Run K6 tests
         run: |
           mkdir -p k6-results
-          k6 run --out json=k6-results/results.json k6-tests/load-test.js
+          k6 run --out json=k6-results/results.json k6-test/load-test.js
 
       - name: Upload results
         uses: actions/upload-artifact@v4
