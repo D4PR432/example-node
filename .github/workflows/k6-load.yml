@@ -1,11 +1,11 @@
-name: K6 Load Tests
+name: K6 Load Tests with Grafana Cloud
 
 on:
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch:  # Permite ejecución manual
+  workflow_dispatch:
 
 jobs:
   k6-test:
@@ -36,13 +36,15 @@ jobs:
           sudo apt-get update
           sudo apt-get install k6
 
-      - name: Run K6 tests
+      - name: Run K6 tests with Grafana Cloud
         run: |
-          mkdir -p k6-results
-          k6 run --out json=k6-results/results.json k6-tests/load-test.js
+          k6 run --out cloud k6-test/load-test.js
+        env:
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
 
-      - name: Upload results
+      - name: Upload results (backup)
         uses: actions/upload-artifact@v4
         with:
           name: k6-results
           path: k6-results/
+        if: always()
