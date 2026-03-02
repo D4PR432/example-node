@@ -1,0 +1,48 @@
+name: K6 Load Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:  # Permite ejecución manual
+
+jobs:
+  k6-test:
+    runs-on: ubuntu-latest
+    name: K6 Load Test
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Start application
+        run: |
+          node src/app.js &
+          sleep 5
+
+      - name: Install K6
+        run: |
+          curl -s https://dl.k6.io/key.gpg | sudo apt-key add -
+          sudo apt-add-repository 'deb https://dl.k6.io/deb stable main'
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run K6 tests
+        run: |
+          mkdir -p k6-results
+          k6 run --out json=k6-results/results.json k6-tests/load-test.js
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-results
+          path: k6-results/
